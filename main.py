@@ -3,6 +3,7 @@
 
 import random
 import time
+import paramiko
 
 from paho.mqtt import client as mqtt_client
 
@@ -14,6 +15,12 @@ client_id = f'python-mqtt-{random.randint(0, 1000)}'
 
 # username = 'emqx'
 # password = 'public'
+
+# Configuração SSH
+ssh_host = 'ubuntu@tsi1.duckdns.org'
+ssh_port = 22
+ssh_username = 'argel'
+ssh_private_key_path = "C:\\Users\Aaaaaaaaa"
 
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
@@ -45,6 +52,15 @@ def publish(client):
 
 
 def run():
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(ssh_host, ssh_port, ssh_username, key_filename=ssh_private_key_path)
+
+    # Conexão MQTT
+    client = connect_mqtt()
+    client.loop_start()
+    publish(client)
+
     client = connect_mqtt()
     client.loop_start()
     publish(client)
